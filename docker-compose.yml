@@ -1,0 +1,28 @@
+version: '3'
+
+
+services:
+    backend:
+        user: ${DOCKER_APP_USER}:${DOCKER_APP_USER}
+        container_name: ${PROJECT_NAME}_php
+        restart: always
+        working_dir: /var/www
+        build:
+            context: .
+            dockerfile: ./docker/backend/Dockerfile
+        volumes:
+            - ./backend:/var/www/backend
+            - /etc/passwd:/etc/passwd
+            - /etc/groups:/etc/groups
+
+    nginx:
+        container_name: ${PROJECT_NAME}_nginx
+        image: nginx:alpine
+        restart: always
+        volumes:
+            - ./backend:/var/www/backend/
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+        ports:
+            - ${NGINX_PORT}:80
+        depends_on:
+            - backend
